@@ -1,0 +1,120 @@
+#include <I2Cdev.h>
+#include <MPU6050.h>
+#include <Wire.h>
+#include <AHRS.h>
+#include <CommunicationUtils.h>
+
+// 单位转换；rad/s
+#define GYRO_CONST PI / (131.072 * 180)
+// 单位转换；g * m / s^2
+#define ACC_CONST 2 / 32768
+
+Vector3 GYRO_BIAS;
+Vector3 ACC_BIAS;
+
+MPU6050 mpu;
+
+int16_t ax, ay, az;
+int16_t gx, gy, gz;
+
+IMU imu;
+AHRS ahrs(100.0, 0.09);
+
+void getGyroBias(Vector3 &gyroBias) {
+	int16_t gx, gy, gz;
+	float g[3] = {0};
+	for (int i = 0; i < 20; ++i) {
+		mpu.getRotation(&gx, &gy, &gz);
+		g[0] += float(gx) * GYRO_CONST;
+		g[1] += float(gy) * GYRO_CONST;
+		g[2] += float(gz) * GYRO_CONST;
+	}
+	gyroBias.x = g[0] / 20;
+	gyroBias.y = g[1] / 20;
+	gyroBias.z = g[2] / 20;
+}
+
+void getAccBias(Vector3 &accBias) {
+	float a[3] = {0};
+	int16_t ax, ay, az;
+	for (int i = 0; i < 20; ++i) {
+		mpu.getAcceleration(&ax, &ay, &az);
+		a[0] += float(gx) * ACC_CONST;
+		a[1] += float(gy) * ACC_CONST;
+		a[2] += float(gz) * ACC_CONST;
+	}
+	accBias.x = a[0] / 20;
+	accBias.y = a[1] / 20;
+	accBias.z = a[2] / 20;
+}
+
+void setup()//MPU6050的设置都采用了默认值，请参看库文件
+{
+    Wire.begin();
+
+    Serial.begin(115200);
+    Serial1.begin(115200);
+
+//    Serial.println("Initializing I2C device.....");
+    mpu.initialize();
+
+//    Serial.println("Testing device connections...");
+//    Serial.println(mpu.testConnection() ? "MPU6050 connection successful":"MPU6050 connection failure");
+
+    getGyroBias(GYRO_BIAS);
+    getAccBias(ACC_BIAS);
+}
+
+Vector3 acc;
+Vector3 oxyz;
+RotaMat rotaMat;
+
+unsigned long int nowTime, lastTime = 0;
+
+void loop()
+{
+	nowTime = millis();
+	if (nowTime > (lastTime + 10)) {
+		lastTime = nowTime;
+
+		mpu.getMotion6(&ax, &ay, &az, &gx, &gy, &gz);
+
+		imu.acc.x = float(ax) * ACC_CONST - ACC_BIAS.x;
+		imu.acc.y = float(ay) * ACC_CONST - ACC_BIAS.y;
+		imu.acc.z = float(az) * ACC_CONST - ACC_BIAS.z;
+
+		imu.gyro.x = float(gx) * GYRO_CONST - GYRO_BIAS.x;
+		imu.gyro.y = float(gy) * GYRO_CONST - GYRO_BIAS.y;
+		imu.gyro.z = float(gz) * GYRO_CONST - GYRO_BIAS.z;
+
+		ahrs.UpdateIMU(imu);
+
+		acc.x = imu.acc.x;
+		acc.y = imu.acc.y;
+		acc.z = imu.acc.z;
+
+		ahrs.GravityCompensateAcc(acc);
+
+		ahrs.QuaternionsToRotationMatrix(rotaMat);
+
+		for (int i = 0; i < 3; ++i) {
+			for (int j = 0; j < 3; ++j) {
+				oxyz.v[i] = acc.v[j] * rotaMat.mat[j][i];
+			}
+		}
+
+		Serial1.print("x = ");
+		Serial1.print(oxyz.x * 10, 7);
+		Serial1.print(",");
+		Serial1.print("y = ");
+		Serial1.print(oxyz.y * 10, 7);
+		Serial1.print(",");
+		Serial1.print("z = ");
+		Serial1.println(oxyz.z * 10, 7);
+
+		serialPrintFloatArr(ahrs.quat.q,4);
+		Serial.println("");
+
+	}
+
+}

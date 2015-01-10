@@ -1,0 +1,16 @@
+Arduino\ Board=Arduino Mega or Mega 2560
+Arduino\ Custom\ Option\ Selections=
+Arduino\ IDE\ Version=1.5.6-r2
+Arduino\ Path=C\:\\Program Files\\Arduino
+Arduino\ Port=COM7
+Arduino\ boards\ file=C\:\\Program Files\\Arduino\\hardware\\arduino\\avr\\boards.txt
+FmStatus=1
+FsStatus=3
+FuStatub=27
+FuStatus=22
+JANTJE.TEMPLATE_FOLDER=
+JANTJE.TEMPLATE_USE_DEFAULT=true
+Private\ Library\ Path=D\:\\Github\\Arduino\\libraries
+Private\ hardware\ Path=D\:\\Github\\Arduino\\hardware
+eclipse.preferences.version=1
+lFsStatus=53

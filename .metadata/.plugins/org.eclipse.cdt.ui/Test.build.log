@@ -1,0 +1,11 @@
+12:32:26 **** Build of configuration Release for project Test ****
+make all 
+Building file: ../Test.cpp
+Starting C++ compile
+"C:/Program Files/Arduino/hardware/tools/avr/bin/avr-g++" -c -g -Os -w -fno-exceptions -ffunction-sections -fdata-sections -MMD -mmcu=atmega2560 -DF_CPU=16000000L -DARDUINO=156-r2 -DARDUINO_AVR_MEGA2560 -DARDUINO_ARCH_AVR    -I"C:\Program Files\Arduino\hardware\arduino\avr\cores\arduino" -I"C:\Program Files\Arduino\hardware\arduino\avr\variants\mega" -I"D:\Github\Arduino\libraries\KalmanFilter" -I"D:\Github\Arduino\libraries\Bluetooth" -I"D:\Github\Arduino\libraries\I2Cdev" -I"D:\Github\Arduino\libraries\Timer" -I"C:\Program Files\Arduino\hardware\arduino\avr\libraries\Wire" -I"C:\Program Files\Arduino\hardware\arduino\avr\libraries\Wire\utility" -MMD -MP -MF"Test.cpp.d" -MT"Test.cpp.d" -D__IN_ECLIPSE__=1 -x c++ "../Test.cpp"  -o  "Test.cpp.o"
+../Test.cpp: In function 'void LPF(float*, const float*, const float*, const float*)':
+../Test.cpp:457: error: invalid operands of types 'const float' and 'const float*' to binary 'operator*'
+make: *** [Test.cpp.o] Error 1
+
+12:32:27 Build Finished (took 852ms)
+
